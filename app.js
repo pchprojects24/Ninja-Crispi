@@ -16,6 +16,7 @@
     researchCards: document.getElementById("researchCards"),
     favoritesOnly: document.getElementById("favoritesOnly"),
     randomRecipeButton: document.getElementById("randomRecipeButton"),
+    showShortcutsButton: document.getElementById("showShortcutsButton"),
     recipeDialog: document.getElementById("recipeDialog"),
     dialogContent: document.getElementById("dialogContent"),
     closeDialogButton: document.getElementById("closeDialogButton"),
@@ -294,6 +295,15 @@
     saveFavorites();
     renderSearchResults();
     renderRecipeCards();
+
+    // Add pulse animation to the button
+    const button = document.querySelector(`[data-favorite-id="${favoriteId}"]`);
+    if (button) {
+      button.classList.add('pulse');
+      setTimeout(() => button.classList.remove('pulse'), 300);
+    }
+
+    showToast(state.favorites.has(favoriteId) ? 'Added to favorites! ⭐' : 'Removed from favorites');
   }
 
   function favoriteButtonMarkup(favoriteId) {
@@ -488,7 +498,10 @@
     if (!results.length) {
       elements.searchResults.innerHTML = `
         <div class="empty-state">
-          Try a broader search like <strong>cleaning</strong>, <strong>air fry</strong>, or <strong>chicken</strong>.
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+          <p style="margin: 0.5rem 0;"><strong>No results found</strong></p>
+          <p style="margin: 0;">Try a broader search like <strong>cleaning</strong>, <strong>air fry</strong>, <strong>chicken</strong>, or <strong>temperature</strong>.</p>
+          ${state.favoritesOnly ? '<p style="margin-top: 1rem;">💡 You have favorites filter enabled. Try turning it off to see more results.</p>' : ''}
         </div>
       `;
       return;
@@ -655,10 +668,14 @@
       renderSearchResults();
     });
 
-    // Search input
+    // Search input with debouncing for performance
+    let searchTimeout;
     elements.searchInput.addEventListener("input", (event) => {
-      state.query = event.target.value;
-      renderSearchResults();
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        state.query = event.target.value;
+        renderSearchResults();
+      }, 150);
     });
 
     // Favorites toggle
@@ -694,6 +711,11 @@
 
     // Random recipe
     elements.randomRecipeButton.addEventListener("click", openRandomRecipe);
+
+    // Shortcuts button
+    if (elements.showShortcutsButton) {
+      elements.showShortcutsButton.addEventListener("click", showKeyboardShortcuts);
+    }
 
     // Dialog controls
     elements.closeDialogButton.addEventListener("click", () => elements.recipeDialog.close());
@@ -806,4 +828,38 @@
 
   // Apply saved theme on load
   setTheme(state.theme);
+
+  // Show welcome message for first-time users
+  const WELCOME_KEY = "app.ninja-crispi.welcome-shown.v1";
+  if (!localStorage.getItem(WELCOME_KEY)) {
+    setTimeout(() => {
+      elements.dialogContent.innerHTML = `
+        <p class="eyebrow">Welcome! 👋</p>
+        <h3>Your Ninja CRISPi Companion</h3>
+        <p style="margin: 1rem 0;">This enhanced web app now includes:</p>
+        <ul style="margin: 1rem 0; padding-left: 1.5rem;">
+          <li>🌙 <strong>Dark Mode</strong> - Toggle with the button in top right or press 'd'</li>
+          <li>⏱️ <strong>Cooking Timer</strong> - Set timers directly from recipes or press 't'</li>
+          <li>⭐ <strong>Recipe Ratings</strong> - Rate your favorite recipes with stars</li>
+          <li>📝 <strong>Personal Notes</strong> - Add your own cooking tips and modifications</li>
+          <li>⌨️ <strong>Keyboard Shortcuts</strong> - Press '?' anytime to see all shortcuts</li>
+          <li>❤️ <strong>Favorites</strong> - Star recipes and filter to show only favorites</li>
+          <li>🎲 <strong>Random Recipe</strong> - Can't decide? Get a random recipe suggestion</li>
+        </ul>
+        <p style="margin: 1rem 0;">All your preferences are saved locally in your browser!</p>
+        <div class="result__actions" style="margin-top: 1.5rem;">
+          <button class="button button--primary" type="button" onclick="document.getElementById('recipeDialog').close()">
+            Let's cook! 🍳
+          </button>
+          <button class="button button--ghost" type="button" onclick="
+            const event = new Event('click');
+            event.target = { closest: () => null };
+            document.getElementById('dialogContent').innerHTML = '';
+          ">Show shortcuts</button>
+        </div>
+      `;
+      elements.recipeDialog.showModal();
+      localStorage.setItem(WELCOME_KEY, "true");
+    }, 1000);
+  }
 })();
