@@ -320,18 +320,20 @@
   }
 
   function renderHero() {
-    elements.productSummary.textContent = `${data.product.summary} ${data.product.appBlurb}`;
+    elements.productSummary.textContent = data.product.summary;
 
     elements.heroStats.innerHTML = [
-      `${data.sources.length} source PDFs`,
-      `${data.pages.length} extracted pages`,
       `${data.recipes.length} recipe spotlights`,
-      `${data.onlineResearch.length} extra links`,
     ]
       .map((label) => `<span class="stat-pill">${label}</span>`)
       .join("");
 
-    elements.quickFacts.innerHTML = data.product.keyFacts
+    // Filter Quick Facts to only essential cooking info
+    const essentialFacts = data.product.keyFacts.filter(fact =>
+      ['Containers', 'Functions'].includes(fact.label)
+    );
+
+    elements.quickFacts.innerHTML = essentialFacts
       .map(
         (fact) => `
           <div>
@@ -365,7 +367,6 @@
         (highlight) => `
           <article class="highlight-card">
             <div class="result__actions">
-              <span class="source-badge">${highlight.source}</span>
               ${favoriteButtonMarkup(`highlight:${highlight.id}`)}
             </div>
             <h3>${highlight.title}</h3>
@@ -391,16 +392,11 @@
         return `
           <article class="recipe-card">
             <div class="result__actions">
-              <span class="source-badge">${recipe.pageRef}</span>
               ${favoriteButtonMarkup(favoriteId)}
             </div>
             <h3>${recipe.title}</h3>
             ${rating > 0 ? `<div class="rating-display" style="color: #fbbf24; margin: 0.5rem 0;">${stars}</div>` : ''}
             <p>${recipe.summary}</p>
-            <div class="recipe-card__meta">
-              <span class="tag tag--source">${recipe.container}</span>
-              <span class="tag tag--source">${recipe.function}</span>
-            </div>
             <div class="tag-row">
               ${recipe.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}
             </div>
@@ -447,7 +443,6 @@
         (item) => `
           <article class="research-card">
             <h3>${item.title}</h3>
-            <p>${item.note}</p>
             <a class="button button--ghost" href="${item.url}" target="_blank" rel="noreferrer">
               Visit source
             </a>
@@ -513,13 +508,11 @@
         (item) => `
           <article class="result">
             <div class="result__actions">
-              <span class="source-badge">${item.subtitle}</span>
               ${favoriteButtonMarkup(item.favoriteId)}
             </div>
             <h3>${highlightText(item.title)}</h3>
             <p>${buildSnippet(item)}</p>
             <div class="result__actions">
-              <span class="result__meta">${item.source}</span>
               ${
                 item.kind === "recipe"
                   ? `<button class="button button--ghost" type="button" data-open-recipe="${item.title}">Open recipe</button>`
@@ -545,11 +538,6 @@
     elements.dialogContent.innerHTML = `
       <p class="eyebrow">Recipe spotlight</p>
       <h3>${recipe.title}</h3>
-      <div class="dialog__meta">
-        <span class="tag tag--source">${recipe.container}</span>
-        <span class="tag tag--source">${recipe.function}</span>
-        <span class="tag tag--source">${recipe.pageRef}</span>
-      </div>
 
       <div style="margin: 1rem 0;">
         <strong>Rate this recipe:</strong>
@@ -561,8 +549,7 @@
       </div>
 
       <p>${recipe.summary}</p>
-      <p><strong>Timing:</strong> ${recipe.time}</p>
-      <p><strong>Servings:</strong> ${recipe.serves}</p>
+      <p><strong>Timing:</strong> ${recipe.time} • <strong>Servings:</strong> ${recipe.serves}</p>
       <div class="tag-row">${recipe.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}</div>
 
       <div class="recipe-notes">
