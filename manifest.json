@@ -1,0 +1,49 @@
+{
+  "name": "Ninja CRISPi Companion",
+  "short_name": "CRISPi",
+  "description": "Your ultimate Ninja CRISPi cooking companion with step-by-step recipes, meal planning, and smart features",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f4ee",
+  "theme_color": "#fc6b21",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["food", "lifestyle", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Search Recipes",
+      "url": "/#searchSection",
+      "description": "Search for recipes and cooking guides"
+    },
+    {
+      "name": "Shopping List",
+      "url": "/?action=shopping",
+      "description": "View your shopping list"
+    },
+    {
+      "name": "Random Recipe",
+      "url": "/?action=random",
+      "description": "Get a random recipe suggestion"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-1.png",
+      "sizes": "540x720",
+      "type": "image/png"
+    }
+  ]
+}

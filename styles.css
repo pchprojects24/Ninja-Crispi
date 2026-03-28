@@ -872,3 +872,487 @@ a:focus-visible {
 html {
   scroll-padding-top: 100px;
 }
+
+/* New Enhanced Features Styles */
+
+/* Difficulty badges */
+.difficulty-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+}
+
+.difficulty-badge.easy {
+  background: rgba(10, 143, 98, 0.15);
+  color: var(--success);
+}
+
+.difficulty-badge.medium {
+  background: rgba(255, 165, 0, 0.15);
+  color: #ff8b00;
+}
+
+.difficulty-badge.advanced {
+  background: rgba(220, 38, 38, 0.15);
+  color: #dc2626;
+}
+
+/* Cooked badge */
+.cooked-badge {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0.25rem 0;
+}
+
+/* Recipe sections */
+.recipe-section {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.recipe-section h4 {
+  margin: 0 0 1rem;
+  color: var(--accent);
+}
+
+/* Serving adjuster */
+.serving-adjuster {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.serving-adjuster button {
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0.25rem 0.5rem;
+  font-size: 1.25rem;
+}
+
+.serving-adjuster span {
+  font-weight: 700;
+  min-width: 50px;
+  text-align: center;
+}
+
+/* Ingredient list */
+.ingredient-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ingredient-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background var(--transition-fast);
+}
+
+.ingredient-list li:hover {
+  background: rgba(252, 107, 33, 0.05);
+}
+
+.ingredient-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.ingredient-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.add-to-list-btn {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-strong);
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: transform var(--transition-fast);
+}
+
+.add-to-list-btn:hover {
+  transform: scale(1.1);
+  background: var(--chip);
+}
+
+/* Steps preview */
+.steps-preview {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.steps-preview li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+/* Cooking mode */
+.cooking-mode {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--surface-strong);
+  z-index: 1000;
+  overflow-y: auto;
+  animation: scaleIn var(--transition-smooth);
+}
+
+.cooking-mode-header {
+  position: sticky;
+  top: 0;
+  background: var(--surface-strong);
+  padding: 1rem;
+  border-bottom: 2px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.cooking-mode-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.cooking-mode-progress {
+  padding: 1rem;
+  background: var(--surface);
+}
+
+.progress-bar {
+  height: 8px;
+  background: var(--chip);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(135deg, var(--accent), #ff8b47);
+  transition: width var(--transition-smooth);
+}
+
+.progress-text {
+  text-align: center;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 0;
+}
+
+.cooking-step {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  animation: fadeIn var(--transition-smooth);
+}
+
+.cooking-step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #ff8b47);
+  color: white;
+  font-weight: 700;
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.cooking-step-text {
+  font-size: 1.25rem;
+  line-height: 1.7;
+  margin: 1rem 0;
+}
+
+.cooking-navigation {
+  display: flex;
+  gap: 1rem;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  justify-content: space-between;
+  position: sticky;
+  bottom: 0;
+  background: var(--surface-strong);
+  border-top: 2px solid var(--border);
+}
+
+@media (max-width: 720px) {
+  .cooking-navigation {
+    flex-wrap: wrap;
+  }
+
+  .cooking-navigation button {
+    flex: 1 1 45%;
+  }
+}
+
+/* Shopping list */
+.shopping-list-container {
+  margin-top: 1rem;
+}
+
+.shopping-list-header {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.shopping-list {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.shopping-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition-fast);
+}
+
+.shopping-list-item:hover {
+  background: rgba(252, 107, 33, 0.05);
+}
+
+.shopping-list-item.checked {
+  opacity: 0.5;
+}
+
+.shopping-list-item.checked span {
+  text-decoration: line-through;
+}
+
+.shopping-list-item label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.shopping-list-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.delete-item {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: var(--muted);
+  transition: all var(--transition-fast);
+}
+
+.delete-item:hover {
+  background: #fee;
+  color: #dc2626;
+  border-color: #dc2626;
+}
+
+.add-item-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.add-item-form input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-strong);
+  color: var(--text);
+}
+
+.empty-message {
+  text-align: center;
+  padding: 2rem;
+  color: var(--muted);
+}
+
+/* Meal plan */
+.meal-plan-days {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.meal-day-btn {
+  padding: 1rem;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.meal-day-btn:hover:not([disabled]) {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  background: rgba(252, 107, 33, 0.05);
+}
+
+.meal-day-btn.planned {
+  background: rgba(10, 143, 98, 0.15);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.meal-day-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Cooking history */
+.history-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.stat-card {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(252, 107, 33, 0.1), rgba(255, 139, 71, 0.05));
+  border-radius: 16px;
+  border: 1px solid rgba(252, 107, 33, 0.2);
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.history-list {
+  margin-top: 1.5rem;
+}
+
+.history-group {
+  margin-bottom: 1.5rem;
+}
+
+.history-group h4 {
+  margin: 0 0 0.75rem;
+  color: var(--accent);
+  font-size: 1rem;
+}
+
+.history-entry {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border-left: 3px solid var(--accent);
+  background: rgba(252, 107, 33, 0.05);
+  margin-bottom: 0.5rem;
+  border-radius: 0 8px 8px 0;
+}
+
+.history-entry .time {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* Achievements */
+.achievements-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--border);
+}
+
+.achievements-section h4 {
+  margin: 0 0 1rem;
+  color: var(--accent);
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+}
+
+.achievement-badge {
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 193, 7, 0.05));
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  border-radius: 12px;
+  text-align: center;
+  transition: transform var(--transition-fast);
+}
+
+.achievement-badge:hover {
+  transform: scale(1.05);
+}
+
+.achievement-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.achievement-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Responsive adjustments for new features */
+@media (max-width: 720px) {
+  .meal-plan-days {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .history-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .achievements-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+
+  .cooking-step {
+    padding: 1rem;
+  }
+
+  .cooking-step-text {
+    font-size: 1rem;
+  }
+}
