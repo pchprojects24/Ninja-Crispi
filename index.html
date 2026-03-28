@@ -8,6 +8,11 @@
       name="description"
       content="A mobile-friendly, searchable companion for the Ninja CRISPi portable cooking system."
     />
+    <link rel="manifest" href="./manifest.json" />
+    <meta name="theme-color" content="#fc6b21" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="CRISPi" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -52,6 +57,12 @@
             <a class="button button--primary" href="#searchSection">Search the guides</a>
             <button class="button button--ghost" id="randomRecipeButton" type="button">
               Pick tonight&rsquo;s idea
+            </button>
+            <button class="button button--ghost" id="shoppingListButton" type="button">
+              🛒 Shopping List
+            </button>
+            <button class="button button--ghost" id="cookingHistoryButton" type="button">
+              📊 My Progress
             </button>
             <button class="button button--ghost" id="showShortcutsButton" type="button" title="Press ? for shortcuts">
               ⌨️ Shortcuts

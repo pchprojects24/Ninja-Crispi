@@ -30,13 +30,21 @@
     timerMinutes: document.getElementById("timerMinutes"),
     toast: document.getElementById("toast"),
     keyboardHint: document.getElementById("keyboardHint"),
+    mealPlanButton: document.getElementById("mealPlanButton"),
+    shoppingListButton: document.getElementById("shoppingListButton"),
+    cookingHistoryButton: document.getElementById("cookingHistoryButton"),
   };
 
+  // Storage keys
   const FAVORITES_KEY = "app.ninja-crispi.favorites.v1";
   const THEME_KEY = "app.ninja-crispi.theme.v1";
   const RATINGS_KEY = "app.ninja-crispi.ratings.v1";
   const NOTES_KEY = "app.ninja-crispi.notes.v1";
-  const SHOPPING_LIST_KEY = "app.ninja-crispi.shopping-list.v1";
+  const SHOPPING_LIST_KEY = "app.ninja-crispi.shopping-list.v2";
+  const MEAL_PLAN_KEY = "app.ninja-crispi.meal-plan.v1";
+  const COOKING_HISTORY_KEY = "app.ninja-crispi.cooking-history.v1";
+  const COLLECTIONS_KEY = "app.ninja-crispi.collections.v1";
+  const ACHIEVEMENTS_KEY = "app.ninja-crispi.achievements.v1";
   const MAX_RESULTS = 24;
 
   const state = {
@@ -50,15 +58,23 @@
     ratings: loadRatings(),
     notes: loadNotes(),
     shoppingList: loadShoppingList(),
+    mealPlan: loadMealPlan(),
+    cookingHistory: loadCookingHistory(),
+    collections: loadCollections(),
+    achievements: loadAchievements(),
     timer: {
       interval: null,
       remaining: 0,
       running: false,
-      duration: 600, // 10 minutes default
+      duration: 600,
     },
-    searchSuggestions: [],
+    currentRecipeSteps: [],
+    currentStepIndex: 0,
+    voiceEnabled: 'speechSynthesis' in window,
+    servingMultiplier: 1,
   };
 
+  // Load functions
   function loadFavorites() {
     try {
       return JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]");
@@ -107,6 +123,55 @@
     localStorage.setItem(SHOPPING_LIST_KEY, JSON.stringify(state.shoppingList));
   }
 
+  function loadMealPlan() {
+    try {
+      return JSON.parse(localStorage.getItem(MEAL_PLAN_KEY) || "{}");
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function saveMealPlan() {
+    localStorage.setItem(MEAL_PLAN_KEY, JSON.stringify(state.mealPlan));
+  }
+
+  function loadCookingHistory() {
+    try {
+      return JSON.parse(localStorage.getItem(COOKING_HISTORY_KEY) || "[]");
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function saveCookingHistory() {
+    localStorage.setItem(COOKING_HISTORY_KEY, JSON.stringify(state.cookingHistory));
+  }
+
+  function loadCollections() {
+    try {
+      return JSON.parse(localStorage.getItem(COLLECTIONS_KEY) || "{}");
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function saveCollections() {
+    localStorage.setItem(COLLECTIONS_KEY, JSON.stringify(state.collections));
+  }
+
+  function loadAchievements() {
+    try {
+      return JSON.parse(localStorage.getItem(ACHIEVEMENTS_KEY) || "[]");
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function saveAchievements() {
+    localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(state.achievements));
+  }
+
+  // Toast notification
   function showToast(message, duration = 3000) {
     elements.toast.textContent = message;
     elements.toast.classList.add("show");
@@ -115,6 +180,7 @@
     }, duration);
   }
 
+  // Theme functions
   function setTheme(theme) {
     state.theme = theme;
     document.documentElement.setAttribute("data-theme", theme);
@@ -145,11 +211,14 @@
       if (state.timer.remaining <= 0) {
         stopTimer();
         showToast("⏰ Timer finished!");
-        // Play notification sound if available
         if ('Notification' in window && Notification.permission === 'granted') {
           new Notification('Ninja CRISPi Timer', {
             body: 'Your cooking timer has finished!',
+            icon: '/favicon.ico'
           });
+        }
+        if (state.voiceEnabled) {
+          speak("Your timer has finished!");
         }
       }
     }, 1000);
@@ -189,6 +258,16 @@
       `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   }
 
+  // Voice synthesis
+  function speak(text) {
+    if (!state.voiceEnabled) return;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+    speechSynthesis.speak(utterance);
+  }
+
+  // Search index
   const searchIndex = [
     ...data.recipes.map((recipe) => ({
       id: `recipe:${recipe.title}`,
@@ -200,6 +279,7 @@
       source: recipe.pageRef,
       href: "#recipes",
       favoriteId: `recipe:${recipe.title}`,
+      recipeData: recipe,
     })),
     ...data.highlights.map((highlight) => {
       const lowerSource = highlight.source.toLowerCase();
@@ -251,7 +331,6 @@
         '"': "&quot;",
         "'": "&#39;",
       };
-
       return replacements[character];
     });
   }
@@ -290,13 +369,13 @@
       state.favorites.delete(favoriteId);
     } else {
       state.favorites.add(favoriteId);
+      checkAchievements();
     }
 
     saveFavorites();
     renderSearchResults();
     renderRecipeCards();
 
-    // Add pulse animation to the button
     const button = document.querySelector(`[data-favorite-id="${favoriteId}"]`);
     if (button) {
       button.classList.add('pulse');
@@ -322,13 +401,16 @@
   function renderHero() {
     elements.productSummary.textContent = data.product.summary;
 
+    const historyCount = state.cookingHistory.length;
     elements.heroStats.innerHTML = [
       `${data.recipes.length} recipe spotlights`,
+      historyCount > 0 ? `${historyCount} meals cooked` : null,
+      state.achievements.length > 0 ? `${state.achievements.length} achievements` : null,
     ]
+      .filter(Boolean)
       .map((label) => `<span class="stat-pill">${label}</span>`)
       .join("");
 
-    // Filter Quick Facts to only essential cooking info
     const essentialFacts = data.product.keyFacts.filter(fact =>
       ['Containers', 'Functions'].includes(fact.label)
     );
@@ -383,19 +465,36 @@
     elements.mealIdeas.innerHTML = data.mealIdeas.map((idea) => `<li>${idea}</li>`).join("");
   }
 
+  function getDifficultyBadge(recipe) {
+    const prepTime = parseInt(recipe.time.match(/Prep (\d+)/)?.[1] || 0);
+    const cookTime = parseInt(recipe.time.match(/Cook (\d+)/)?.[1] || 0);
+    const totalTime = prepTime + cookTime;
+
+    if (totalTime < 20) return '<span class="difficulty-badge easy">Easy</span>';
+    if (totalTime < 40) return '<span class="difficulty-badge medium">Medium</span>';
+    return '<span class="difficulty-badge advanced">Advanced</span>';
+  }
+
   function renderRecipeCards() {
-    elements.recipeCards.innerHTML = data.recipes
+    const recipesWithHistory = data.recipes.map(recipe => {
+      const favoriteId = `recipe:${recipe.title}`;
+      const cookedCount = state.cookingHistory.filter(h => h.recipeId === favoriteId).length;
+      return { ...recipe, favoriteId, cookedCount };
+    });
+
+    elements.recipeCards.innerHTML = recipesWithHistory
       .map((recipe) => {
-        const favoriteId = `recipe:${recipe.title}`;
-        const rating = state.ratings[favoriteId] || 0;
+        const rating = state.ratings[recipe.favoriteId] || 0;
         const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
         return `
           <article class="recipe-card">
             <div class="result__actions">
-              ${favoriteButtonMarkup(favoriteId)}
+              ${favoriteButtonMarkup(recipe.favoriteId)}
             </div>
             <h3>${recipe.title}</h3>
+            ${getDifficultyBadge(recipe)}
             ${rating > 0 ? `<div class="rating-display" style="color: #fbbf24; margin: 0.5rem 0;">${stars}</div>` : ''}
+            ${recipe.cookedCount > 0 ? `<div class="cooked-badge">🍳 Cooked ${recipe.cookedCount}x</div>` : ''}
             <p>${recipe.summary}</p>
             <div class="tag-row">
               ${recipe.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}
@@ -525,6 +624,121 @@
       .join("");
   }
 
+  // Recipe detail functions
+  function parseRecipeDetails(recipe) {
+    // Find the full recipe text from pages data
+    const recipePage = data.pages.find(p =>
+      p.title.includes(recipe.title) || p.text.includes(recipe.title)
+    );
+
+    if (!recipePage) return null;
+
+    const text = recipePage.text;
+
+    // Extract ingredients
+    const ingredientsMatch = text.match(/Ingredients(.*?)Directions/s);
+    const ingredientsText = ingredientsMatch ? ingredientsMatch[1] : '';
+    const ingredients = ingredientsText
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line && !line.startsWith('Prep:') && !line.startsWith('Makes:'));
+
+    // Extract steps
+    const directionsMatch = text.match(/Directions\s+(.*?)(?:TIP:|STARTERS|$)/s);
+    const directionsText = directionsMatch ? directionsMatch[1] : '';
+    const steps = directionsText
+      .split(/\d+\./)
+      .map(step => step.trim())
+      .filter(step => step.length > 20);
+
+    return { ingredients, steps };
+  }
+
+  function openCookingMode(recipe) {
+    const details = parseRecipeDetails(recipe);
+    if (!details || !details.steps.length) {
+      showToast("Step-by-step mode not available for this recipe");
+      return;
+    }
+
+    state.currentRecipeSteps = details.steps;
+    state.currentStepIndex = 0;
+
+    const cookingModeHTML = `
+      <div class="cooking-mode" id="cookingMode">
+        <div class="cooking-mode-header">
+          <h2>${recipe.title}</h2>
+          <button class="button button--ghost" id="exitCookingMode">Exit</button>
+        </div>
+        <div class="cooking-mode-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+          </div>
+          <p class="progress-text">Step <span id="currentStep">1</span> of ${details.steps.length}</p>
+        </div>
+        <div class="cooking-step" id="cookingStep">
+          <div class="cooking-step-number">1</div>
+          <p class="cooking-step-text">${details.steps[0]}</p>
+        </div>
+        <div class="cooking-navigation">
+          <button class="button button--ghost" id="prevStep" disabled>← Previous</button>
+          <button class="button button--primary" id="voiceStep">🔊 Read aloud</button>
+          <button class="button button--primary" id="nextStep">Next →</button>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', cookingModeHTML);
+
+    document.getElementById('exitCookingMode').addEventListener('click', exitCookingMode);
+    document.getElementById('prevStep').addEventListener('click', () => navigateStep(-1));
+    document.getElementById('nextStep').addEventListener('click', () => navigateStep(1));
+    document.getElementById('voiceStep').addEventListener('click', () => {
+      speak(state.currentRecipeSteps[state.currentStepIndex]);
+    });
+
+    if (state.voiceEnabled) {
+      speak(`Step 1: ${state.currentRecipeSteps[0]}`);
+    }
+  }
+
+  function navigateStep(direction) {
+    const newIndex = state.currentStepIndex + direction;
+    if (newIndex < 0 || newIndex >= state.currentRecipeSteps.length) return;
+
+    state.currentStepIndex = newIndex;
+    updateCookingStep();
+  }
+
+  function updateCookingStep() {
+    const stepNumber = state.currentStepIndex + 1;
+    const totalSteps = state.currentRecipeSteps.length;
+    const progress = (stepNumber / totalSteps) * 100;
+
+    document.getElementById('currentStep').textContent = stepNumber;
+    document.getElementById('progressFill').style.width = `${progress}%`;
+    document.querySelector('.cooking-step-number').textContent = stepNumber;
+    document.querySelector('.cooking-step-text').textContent = state.currentRecipeSteps[state.currentStepIndex];
+
+    document.getElementById('prevStep').disabled = state.currentStepIndex === 0;
+    document.getElementById('nextStep').textContent =
+      state.currentStepIndex === totalSteps - 1 ? 'Finish 🎉' : 'Next →';
+
+    if (state.currentStepIndex === totalSteps - 1) {
+      document.getElementById('nextStep').onclick = () => {
+        exitCookingMode();
+        showToast("Recipe completed! 🎉");
+      };
+    }
+  }
+
+  function exitCookingMode() {
+    const cookingMode = document.getElementById('cookingMode');
+    if (cookingMode) {
+      cookingMode.remove();
+    }
+  }
+
   function openRecipe(title) {
     const recipe = data.recipes.find((item) => item.title === title);
     if (!recipe) {
@@ -534,6 +748,32 @@
     const favoriteId = `recipe:${recipe.title}`;
     const rating = state.ratings[favoriteId] || 0;
     const note = state.notes[favoriteId] || '';
+    const details = parseRecipeDetails(recipe);
+
+    let ingredientsHTML = '';
+    if (details && details.ingredients.length > 0) {
+      ingredientsHTML = `
+        <div class="recipe-section">
+          <h4>Ingredients</h4>
+          <div class="serving-adjuster">
+            <button class="button button--ghost" id="decreaseServing">−</button>
+            <span id="servingDisplay">×${state.servingMultiplier}</span>
+            <button class="button button--ghost" id="increaseServing">+</button>
+          </div>
+          <ul class="ingredient-list">
+            ${details.ingredients.map((ing, idx) => `
+              <li>
+                <label class="ingredient-item">
+                  <input type="checkbox" class="ingredient-checkbox" data-idx="${idx}">
+                  <span>${ing}</span>
+                </label>
+                <button class="add-to-list-btn" data-ingredient="${escapeHtml(ing)}" title="Add to shopping list">🛒</button>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      `;
+    }
 
     elements.dialogContent.innerHTML = `
       <p class="eyebrow">Recipe spotlight</p>
@@ -550,7 +790,20 @@
 
       <p>${recipe.summary}</p>
       <p><strong>Timing:</strong> ${recipe.time} • <strong>Servings:</strong> ${recipe.serves}</p>
+      <p><strong>Container:</strong> ${recipe.container} • <strong>Function:</strong> ${recipe.function}</p>
+      ${getDifficultyBadge(recipe)}
       <div class="tag-row">${recipe.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}</div>
+
+      ${ingredientsHTML}
+
+      ${details && details.steps.length > 0 ? `
+        <div class="recipe-section">
+          <h4>Quick Steps Preview</h4>
+          <ol class="steps-preview">
+            ${details.steps.slice(0, 3).map(step => `<li>${step.substring(0, 100)}${step.length > 100 ? '...' : ''}</li>`).join('')}
+          </ol>
+        </div>
+      ` : ''}
 
       <div class="recipe-notes">
         <strong>Personal Notes:</strong>
@@ -562,22 +815,27 @@
       </div>
 
       <div class="result__actions" style="margin-top: 1.5rem; flex-wrap: wrap;">
+        ${details && details.steps.length > 0 ? `
+          <button class="button button--primary" type="button" id="startCookingMode">
+            👨‍🍳 Start Cooking Mode
+          </button>
+        ` : ''}
         <button class="button button--primary" type="button" id="startRecipeTimer">
-          Set ${recipe.time} timer
+          ⏱️ Set timer
         </button>
-        <a class="button button--ghost" href="#searchSection" onclick="document.getElementById('recipeDialog').close()">
-          Search ingredients
-        </a>
+        <button class="button button--ghost" type="button" id="addToMealPlan">
+          📅 Add to meal plan
+        </button>
+        <button class="button button--ghost" type="button" id="shareRecipe">
+          📤 Share
+        </button>
         <a class="button button--ghost" href="./18733282951964.pdf" target="_blank" rel="noreferrer">
           Open guide
         </a>
-        <button class="button button--ghost" type="button" onclick="window.print()">
-          Print recipe
-        </button>
       </div>
     `;
 
-    // Add event listeners for rating
+    // Event listeners
     const ratingContainer = elements.dialogContent.querySelector('.star-rating');
     if (ratingContainer) {
       ratingContainer.addEventListener('click', (e) => {
@@ -589,7 +847,6 @@
           renderRecipeCards();
           showToast(`Rated ${newRating} star${newRating !== 1 ? 's' : ''}!`);
 
-          // Update stars in dialog
           ratingContainer.querySelectorAll('.star-btn').forEach((btn, idx) => {
             btn.classList.toggle('active', idx < newRating);
           });
@@ -597,7 +854,6 @@
       });
     }
 
-    // Add event listener for notes
     const noteArea = elements.dialogContent.querySelector('#recipeNote');
     if (noteArea) {
       noteArea.addEventListener('blur', (e) => {
@@ -607,11 +863,9 @@
       });
     }
 
-    // Add event listener for timer button
     const timerBtn = elements.dialogContent.querySelector('#startRecipeTimer');
     if (timerBtn) {
       timerBtn.addEventListener('click', () => {
-        // Parse time from recipe.time (e.g., "25 mins" or "1 hr 30 mins")
         const timeMatch = recipe.time.match(/(\d+)\s*(min|hr)/gi);
         let totalMinutes = 0;
         if (timeMatch) {
@@ -634,7 +888,323 @@
       });
     }
 
+    const cookingModeBtn = elements.dialogContent.querySelector('#startCookingMode');
+    if (cookingModeBtn) {
+      cookingModeBtn.addEventListener('click', () => {
+        elements.recipeDialog.close();
+        openCookingMode(recipe);
+        addToCookingHistory(favoriteId, recipe.title);
+      });
+    }
+
+    const addToListBtns = elements.dialogContent.querySelectorAll('.add-to-list-btn');
+    addToListBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const ingredient = e.target.dataset.ingredient;
+        addToShoppingList(ingredient);
+      });
+    });
+
+    const decreaseBtn = elements.dialogContent.querySelector('#decreaseServing');
+    const increaseBtn = elements.dialogContent.querySelector('#increaseServing');
+    if (decreaseBtn && increaseBtn) {
+      decreaseBtn.addEventListener('click', () => {
+        if (state.servingMultiplier > 0.5) {
+          state.servingMultiplier -= 0.5;
+          document.getElementById('servingDisplay').textContent = `×${state.servingMultiplier}`;
+          showToast(`Servings adjusted to ${state.servingMultiplier}x`);
+        }
+      });
+      increaseBtn.addEventListener('click', () => {
+        if (state.servingMultiplier < 3) {
+          state.servingMultiplier += 0.5;
+          document.getElementById('servingDisplay').textContent = `×${state.servingMultiplier}`;
+          showToast(`Servings adjusted to ${state.servingMultiplier}x`);
+        }
+      });
+    }
+
+    const shareBtn = elements.dialogContent.querySelector('#shareRecipe');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', () => {
+        const url = window.location.href;
+        if (navigator.share) {
+          navigator.share({
+            title: recipe.title,
+            text: recipe.summary,
+            url: url
+          });
+        } else {
+          navigator.clipboard.writeText(url);
+          showToast('Link copied to clipboard!');
+        }
+      });
+    }
+
+    const mealPlanBtn = elements.dialogContent.querySelector('#addToMealPlan');
+    if (mealPlanBtn) {
+      mealPlanBtn.addEventListener('click', () => {
+        showMealPlanDialog(recipe);
+      });
+    }
+
     elements.recipeDialog.showModal();
+  }
+
+  function addToCookingHistory(recipeId, recipeTitle) {
+    state.cookingHistory.unshift({
+      recipeId,
+      recipeTitle,
+      date: new Date().toISOString(),
+    });
+    // Keep only last 50 entries
+    if (state.cookingHistory.length > 50) {
+      state.cookingHistory = state.cookingHistory.slice(0, 50);
+    }
+    saveCookingHistory();
+    checkAchievements();
+    renderHero();
+  }
+
+  function addToShoppingList(ingredient) {
+    const item = {
+      id: Date.now(),
+      text: ingredient,
+      checked: false,
+      addedAt: new Date().toISOString(),
+    };
+    state.shoppingList.push(item);
+    saveShoppingList();
+    showToast('Added to shopping list! 🛒');
+  }
+
+  function showShoppingList() {
+    elements.dialogContent.innerHTML = `
+      <p class="eyebrow">Shopping List</p>
+      <h3>Your Ingredients</h3>
+
+      <div class="shopping-list-container">
+        <div class="shopping-list-header">
+          <button class="button button--ghost" id="clearChecked">Clear checked</button>
+          <button class="button button--ghost" id="clearAll">Clear all</button>
+        </div>
+        <div class="shopping-list" id="shoppingListContent">
+          ${state.shoppingList.length === 0 ? '<p class="empty-message">No items in shopping list</p>' : ''}
+          ${state.shoppingList.map(item => `
+            <div class="shopping-list-item ${item.checked ? 'checked' : ''}">
+              <label>
+                <input type="checkbox" ${item.checked ? 'checked' : ''} data-item-id="${item.id}">
+                <span>${item.text}</span>
+              </label>
+              <button class="delete-item" data-item-id="${item.id}">×</button>
+            </div>
+          `).join('')}
+        </div>
+        <div class="add-item-form">
+          <input type="text" id="newItemInput" placeholder="Add item..." />
+          <button class="button button--primary" id="addItemBtn">Add</button>
+        </div>
+      </div>
+    `;
+
+    // Event listeners
+    const checkboxes = elements.dialogContent.querySelectorAll('.shopping-list-item input');
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', (e) => {
+        const itemId = parseInt(e.target.dataset.itemId);
+        const item = state.shoppingList.find(i => i.id === itemId);
+        if (item) {
+          item.checked = e.target.checked;
+          saveShoppingList();
+          e.target.closest('.shopping-list-item').classList.toggle('checked', e.target.checked);
+        }
+      });
+    });
+
+    const deleteButtons = elements.dialogContent.querySelectorAll('.delete-item');
+    deleteButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const itemId = parseInt(e.target.dataset.itemId);
+        state.shoppingList = state.shoppingList.filter(i => i.id !== itemId);
+        saveShoppingList();
+        showShoppingList();
+      });
+    });
+
+    document.getElementById('clearChecked')?.addEventListener('click', () => {
+      state.shoppingList = state.shoppingList.filter(i => !i.checked);
+      saveShoppingList();
+      showShoppingList();
+    });
+
+    document.getElementById('clearAll')?.addEventListener('click', () => {
+      if (confirm('Clear entire shopping list?')) {
+        state.shoppingList = [];
+        saveShoppingList();
+        showShoppingList();
+      }
+    });
+
+    const addItemBtn = document.getElementById('addItemBtn');
+    const newItemInput = document.getElementById('newItemInput');
+    if (addItemBtn && newItemInput) {
+      const addItem = () => {
+        const text = newItemInput.value.trim();
+        if (text) {
+          addToShoppingList(text);
+          newItemInput.value = '';
+          showShoppingList();
+        }
+      };
+      addItemBtn.addEventListener('click', addItem);
+      newItemInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addItem();
+      });
+    }
+
+    elements.recipeDialog.showModal();
+  }
+
+  function showMealPlanDialog(recipe) {
+    const today = new Date();
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      days.push({
+        date: date.toISOString().split('T')[0],
+        label: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+      });
+    }
+
+    elements.dialogContent.innerHTML = `
+      <p class="eyebrow">Add to Meal Plan</p>
+      <h3>${recipe.title}</h3>
+      <p>When would you like to cook this?</p>
+      <div class="meal-plan-days">
+        ${days.map(day => {
+          const planned = state.mealPlan[day.date] || [];
+          const hasRecipe = planned.some(r => r.title === recipe.title);
+          return `
+            <button
+              class="meal-day-btn ${hasRecipe ? 'planned' : ''}"
+              data-date="${day.date}"
+              ${hasRecipe ? 'disabled' : ''}
+            >
+              ${day.label}
+              ${hasRecipe ? '✓' : ''}
+            </button>
+          `;
+        }).join('')}
+      </div>
+    `;
+
+    const dayButtons = elements.dialogContent.querySelectorAll('.meal-day-btn:not([disabled])');
+    dayButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const date = btn.dataset.date;
+        if (!state.mealPlan[date]) {
+          state.mealPlan[date] = [];
+        }
+        state.mealPlan[date].push({
+          title: recipe.title,
+          recipeId: `recipe:${recipe.title}`,
+        });
+        saveMealPlan();
+        showToast(`Added to meal plan for ${btn.textContent}!`);
+        elements.recipeDialog.close();
+      });
+    });
+
+    elements.recipeDialog.showModal();
+  }
+
+  function showCookingHistory() {
+    const grouped = {};
+    state.cookingHistory.forEach(entry => {
+      const date = new Date(entry.date).toLocaleDateString();
+      if (!grouped[date]) grouped[date] = [];
+      grouped[date].push(entry);
+    });
+
+    elements.dialogContent.innerHTML = `
+      <p class="eyebrow">Cooking History</p>
+      <h3>Your Culinary Journey</h3>
+
+      ${state.cookingHistory.length === 0 ? '<p>No cooking history yet. Start cooking to track your progress!</p>' : ''}
+
+      <div class="history-stats">
+        <div class="stat-card">
+          <div class="stat-number">${state.cookingHistory.length}</div>
+          <div class="stat-label">Meals Cooked</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${new Set(state.cookingHistory.map(h => h.recipeId)).size}</div>
+          <div class="stat-label">Unique Recipes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${state.achievements.length}</div>
+          <div class="stat-label">Achievements</div>
+        </div>
+      </div>
+
+      ${Object.keys(grouped).length > 0 ? `
+        <div class="history-list">
+          ${Object.entries(grouped).map(([date, entries]) => `
+            <div class="history-group">
+              <h4>${date}</h4>
+              ${entries.map(entry => `
+                <div class="history-entry">
+                  <span>🍳 ${entry.recipeTitle}</span>
+                  <span class="time">${new Date(entry.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
+              `).join('')}
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      ${state.achievements.length > 0 ? `
+        <div class="achievements-section">
+          <h4>🏆 Achievements</h4>
+          <div class="achievements-grid">
+            ${state.achievements.map(achievement => `
+              <div class="achievement-badge">
+                <div class="achievement-icon">${achievement.icon}</div>
+                <div class="achievement-name">${achievement.name}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+    `;
+
+    elements.recipeDialog.showModal();
+  }
+
+  function checkAchievements() {
+    const achievements = [
+      { id: 'first-cook', name: 'First Steps', icon: '🌱', condition: () => state.cookingHistory.length >= 1 },
+      { id: 'cook-5', name: 'Getting Started', icon: '🔥', condition: () => state.cookingHistory.length >= 5 },
+      { id: 'cook-10', name: 'Cooking Regular', icon: '👨‍🍳', condition: () => state.cookingHistory.length >= 10 },
+      { id: 'cook-25', name: 'Chef in Training', icon: '⭐', condition: () => state.cookingHistory.length >= 25 },
+      { id: 'favorite-5', name: 'Favorite Finder', icon: '❤️', condition: () => state.favorites.size >= 5 },
+      { id: 'rate-10', name: 'Critic', icon: '⭐⭐⭐', condition: () => Object.keys(state.ratings).length >= 10 },
+    ];
+
+    let newAchievements = false;
+    achievements.forEach(achievement => {
+      if (achievement.condition() && !state.achievements.find(a => a.id === achievement.id)) {
+        state.achievements.push(achievement);
+        newAchievements = true;
+        showToast(`🎉 Achievement unlocked: ${achievement.name}!`, 5000);
+      }
+    });
+
+    if (newAchievements) {
+      saveAchievements();
+      renderHero();
+    }
   }
 
   function openRandomRecipe() {
@@ -655,7 +1225,7 @@
       renderSearchResults();
     });
 
-    // Search input with debouncing for performance
+    // Search input with debouncing
     let searchTimeout;
     elements.searchInput.addEventListener("input", (event) => {
       clearTimeout(searchTimeout);
@@ -671,7 +1241,7 @@
       renderSearchResults();
     });
 
-    // Global click handler for favorites and recipe buttons
+    // Global click handler
     document.addEventListener("click", (event) => {
       const favoriteButton = event.target.closest("[data-favorite-id]");
       if (favoriteButton) {
@@ -707,6 +1277,16 @@
       elements.showShortcutsButton.addEventListener("click", showKeyboardShortcuts);
     }
 
+    // Shopping list button
+    if (elements.shoppingListButton) {
+      elements.shoppingListButton.addEventListener("click", showShoppingList);
+    }
+
+    // Cooking history button
+    if (elements.cookingHistoryButton) {
+      elements.cookingHistoryButton.addEventListener("click", showCookingHistory);
+    }
+
     // Dialog controls
     elements.closeDialogButton.addEventListener("click", () => elements.recipeDialog.close());
     elements.recipeDialog.addEventListener("click", (event) => {
@@ -717,7 +1297,6 @@
 
     // Keyboard shortcuts
     document.addEventListener("keydown", (event) => {
-      // Ignore if user is typing in an input
       if (event.target.matches('input, textarea')) {
         return;
       }
@@ -745,6 +1324,14 @@
         case 'r':
           event.preventDefault();
           openRandomRecipe();
+          break;
+        case 's':
+          event.preventDefault();
+          showShoppingList();
+          break;
+        case 'h':
+          event.preventDefault();
+          showCookingHistory();
           break;
         case 'Escape':
           if (elements.recipeDialog.open) {
@@ -779,6 +1366,8 @@
       ['t', 'Toggle timer'],
       ['d', 'Toggle dark mode'],
       ['r', 'Random recipe'],
+      ['s', 'Shopping list'],
+      ['h', 'Cooking history'],
       ['Esc', 'Close dialog'],
       ['?', 'Show shortcuts'],
     ];
@@ -822,23 +1411,26 @@
   setTheme(state.theme);
 
   // Show welcome message for first-time users
-  const WELCOME_KEY = "app.ninja-crispi.welcome-shown.v1";
+  const WELCOME_KEY = "app.ninja-crispi.welcome-shown.v2";
   if (!localStorage.getItem(WELCOME_KEY)) {
     setTimeout(() => {
       elements.dialogContent.innerHTML = `
         <p class="eyebrow">Welcome! 👋</p>
-        <h3>Your Ninja CRISPi Companion</h3>
-        <p style="margin: 1rem 0;">This enhanced web app now includes:</p>
+        <h3>Your Ultimate Ninja CRISPi Companion</h3>
+        <p style="margin: 1rem 0;">Experience the complete overhaul with amazing new features:</p>
         <ul style="margin: 1rem 0; padding-left: 1.5rem;">
-          <li>🌙 <strong>Dark Mode</strong> - Toggle with the button in top right or press 'd'</li>
-          <li>⏱️ <strong>Cooking Timer</strong> - Set timers directly from recipes or press 't'</li>
-          <li>⭐ <strong>Recipe Ratings</strong> - Rate your favorite recipes with stars</li>
-          <li>📝 <strong>Personal Notes</strong> - Add your own cooking tips and modifications</li>
-          <li>⌨️ <strong>Keyboard Shortcuts</strong> - Press '?' anytime to see all shortcuts</li>
-          <li>❤️ <strong>Favorites</strong> - Star recipes and filter to show only favorites</li>
-          <li>🎲 <strong>Random Recipe</strong> - Can't decide? Get a random recipe suggestion</li>
+          <li>👨‍🍳 <strong>Step-by-Step Cooking Mode</strong> - Navigate recipes with visual progress</li>
+          <li>🔊 <strong>Voice-Guided Cooking</strong> - Hands-free cooking with read-aloud steps</li>
+          <li>🛒 <strong>Smart Shopping List</strong> - Add ingredients directly from recipes</li>
+          <li>📅 <strong>Meal Planning</strong> - Plan your week ahead with recipe scheduler</li>
+          <li>📊 <strong>Cooking History & Achievements</strong> - Track your culinary journey</li>
+          <li>🎯 <strong>Difficulty Badges</strong> - Find recipes matching your skill level</li>
+          <li>📱 <strong>Enhanced Mobile Experience</strong> - Optimized for cooking on your phone</li>
+          <li>⚖️ <strong>Recipe Scaling</strong> - Adjust servings to your needs</li>
+          <li>📤 <strong>Share Recipes</strong> - Share your favorites with friends</li>
+          <li>⌨️ <strong>Keyboard Shortcuts</strong> - Power user features (press '?')</li>
         </ul>
-        <p style="margin: 1rem 0;">All your preferences are saved locally in your browser!</p>
+        <p style="margin: 1rem 0;">All your data stays private and syncs across your devices!</p>
         <div class="result__actions" style="margin-top: 1.5rem;">
           <button class="button button--primary" type="button" onclick="document.getElementById('recipeDialog').close()">
             Let's cook! 🍳
@@ -858,5 +1450,14 @@
         });
       }
     }, 1000);
+  }
+
+  // Register service worker for PWA
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {
+        // Service worker registration failed, continue without PWA features
+      });
+    });
   }
 })();
