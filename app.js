@@ -21,10 +21,13 @@
     closeDialogButton: document.getElementById("closeDialogButton"),
   };
 
-  const FAVORITES_KEY = "ninja-crispi-favorites";
+  const FAVORITES_KEY = "app.ninja-crispi.favorites.v1";
+  const MAX_RESULTS = 24;
   const state = {
     activeFilter: "all",
     query: "",
+    queryRegex: null,
+    queryRegexSource: "",
     favoritesOnly: false,
     favorites: new Set(loadFavorites()),
   };
@@ -41,20 +44,23 @@
       href: "#recipes",
       favoriteId: `recipe:${recipe.title}`,
     })),
-    ...data.highlights.map((highlight) => ({
-      id: `highlight:${highlight.id}`,
-      kind: "highlight",
-      category: highlight.category,
-      title: highlight.title,
-      subtitle: "Guide summary",
-      text: highlight.bullets.join(" "),
-      source: highlight.source,
-      href:
-        highlight.source.toLowerCase().includes("owner") || highlight.source.toLowerCase().includes("care")
-          ? "download.pdf"
-          : "18733282951964.pdf",
-      favoriteId: `highlight:${highlight.id}`,
-    })),
+    ...data.highlights.map((highlight) => {
+      const lowerSource = highlight.source.toLowerCase();
+      return {
+        id: `highlight:${highlight.id}`,
+        kind: "highlight",
+        category: highlight.category,
+        title: highlight.title,
+        subtitle: "Guide summary",
+        text: highlight.bullets.join(" "),
+        source: highlight.source,
+        href:
+          lowerSource.includes("owner") || lowerSource.includes("care")
+            ? "download.pdf"
+            : "18733282951964.pdf",
+        favoriteId: `highlight:${highlight.id}`,
+      };
+    }),
     ...data.pages.map((page) => ({
       id: page.id,
       kind: "page",
@@ -111,8 +117,23 @@
       return safe;
     }
 
-    const expression = new RegExp(`(${escapeRegExp(state.query.trim())})`, "ig");
+    const expression = getQueryRegex();
     return safe.replace(expression, "<mark>$1</mark>");
+  }
+
+  function getQueryRegex() {
+    const query = state.query.trim();
+    if (!query) {
+      return null;
+    }
+
+    if (state.queryRegex && state.queryRegexSource === query) {
+      return state.queryRegex;
+    }
+
+    state.queryRegexSource = query;
+    state.queryRegex = new RegExp(`(${escapeRegExp(query)})`, "ig");
+    return state.queryRegex;
   }
 
   function escapeRegExp(value) {
@@ -145,7 +166,7 @@
   }
 
   function renderHero() {
-    elements.productSummary.textContent = `${data.product.summary} Built from the manuals in this repository, with quick links, favorites, and search so the two of you can use it like a pocket guide.`;
+    elements.productSummary.textContent = `${data.product.summary} ${data.product.appBlurb}`;
 
     elements.heroStats.innerHTML = [
       `${data.sources.length} source PDFs`,
@@ -311,7 +332,7 @@
       return matchesFilter && matchesText && matchesFavorite;
     });
 
-    const displayedCount = Math.min(results.length, 24);
+    const displayedCount = Math.min(results.length, MAX_RESULTS);
     elements.resultsSummary.textContent =
       results.length > displayedCount
         ? `Showing ${displayedCount} of ${results.length} results`
@@ -327,7 +348,7 @@
     }
 
     elements.searchResults.innerHTML = results
-      .slice(0, 24)
+      .slice(0, MAX_RESULTS)
       .map(
         (item) => `
           <article class="result">
@@ -342,9 +363,7 @@
               ${
                 item.kind === "recipe"
                   ? `<button class="button button--ghost" type="button" data-open-recipe="${item.title}">Open recipe</button>`
-                  : `<a class="button button--ghost" href="./${item.href}" ${
-                      item.kind !== "recipe" ? 'target="_blank" rel="noreferrer"' : ""
-                    }>Open source</a>`
+                  : `<a class="button button--ghost" href="./${item.href}" target="_blank" rel="noreferrer">Open source</a>`
               }
             </div>
           </article>

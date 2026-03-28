@@ -7,10 +7,11 @@ window.NINJA_CRISPI_DATA = {
     ],
     "tagline": "Snap it. Crisp it. Serve it. Store it.",
     "summary": "A portable glass-container air fryer system built around the CRISPi PowerPod and TempWare containers.",
+    "appBlurb": "Built from the manuals in this repository, with quick links, favorites, and search so it works like a pocket guide on your phone.",
     "keyFacts": [
       {
         "label": "PowerPod",
-        "value": "1700 watts in the supplied quick-start guide; owner guide describes the FN100 portable PowerPod platform."
+        "value": "The quick start guide describes a 1700-watt pod, while the FN100 owner’s guide specifications list 1500W; verify the printed label on your own unit if exact wattage matters."
       },
       {
         "label": "Containers",
@@ -18,7 +19,7 @@ window.NINJA_CRISPI_DATA = {
       },
       {
         "label": "Functions",
-        "value": "Quick-start guide: Air Fry, Roast, Recrisp, Keep Warm. Owner guide also documents Max Crisp and Bake on supported models."
+        "value": "Quick start guide: Air Fry, Roast, Recrisp, Keep Warm. Owner guide also documents Max Crisp and Bake on supported models."
       },
       {
         "label": "Materials",
@@ -315,7 +316,7 @@ window.NINJA_CRISPI_DATA = {
       "category": "how-to",
       "title": "How to crisp dishes and recrisp leftovers",
       "excerpt": "6 7 Questions? ninjakitchen.co.uk Crisping Dishes Air fry fresh or frozen food to perfection. How to Crisp Roast Air Fry 1 Choose your container and add Crisper Plate 2 Add food Prep with seasoning or marinate if needed.…",
-      "text": "6 7 Questions? ninjakitchen.co.uk Crisping Dishes Air fry fresh or frozen food to perfection. How to Crisp Roast Air Fry 1 Choose your container and add Crisper Plate 2 Add food Prep with seasoning or marinate if needed. Tip: You can marinate directly in the TempWare container. 3 Attach pod and select mode Attach pod onto adaptor until you hear front and back click. Place assembled pod and adaptor on top of container. Select mode and adjust time as needed. 4 Turn the food occasionally Lift the pod to turn ingredients 1-2 times using silicone-tipped tongs. 5 Serve TempWare containers can be placed directly on any surface. Safe sense Cooking will automatically pause when you remove the pod from the container. To resume cooking, place PowerPod on container and press START. Note: Adaptor should not be used when cooking with the small container. Note: Parchment paper cannot be used in the TempWare containers Note: PowerPod can be set down on a surface with durable, heat-safe feet. Recrisping leftovers Revive leftovers into new dishes. How to Recrisp Recrisp Tip: The Small Container 1.4L container is the perfect size for leftovers. 3 4 1 Add Crisper Plate 2 Add foods for crisping Add foods that you want to crisp (proteins, veggies, etc.). Attach PowerPod and select mode Place PowerPod on container. Select Recrisp. Cook for 5-12 minutes or until food is heated through. Remove Crisper Plate and serve Use a fork to remove the Crisper Plate, then serve. TempGuard containers can be placed directly on a surface. WATCH VIDEOS ON HOW TO GET STARTED Use the adaptor for the large container. When checking food, lift away pod with adaptor connected. Tips: Large Container 3.8L Small Container 1.4L"
+      "text": "6 7 Questions? ninjakitchen.co.uk Crisping Dishes Air fry fresh or frozen food to perfection. How to Crisp Roast Air Fry 1 Choose your container and add Crisper Plate 2 Add food Prep with seasoning or marinate if needed. Tip: You can marinate directly in the TempWare container. 3 Attach pod and select mode Attach pod onto adaptor until you hear front and back click. Place assembled pod and adaptor on top of container. Select mode and adjust time as needed. 4 Turn the food occasionally Lift the pod to turn ingredients 1-2 times using silicone-tipped tongs. 5 Serve TempWare containers can be placed directly on any surface. Safe sense Cooking will automatically pause when you remove the pod from the container. To resume cooking, place PowerPod on container and press START. Note: Adaptor should not be used when cooking with the small container. Note: Parchment paper cannot be used in the TempWare containers Note: PowerPod can be set down on a surface with durable, heat-safe feet. Recrisping leftovers Revive leftovers into new dishes. How to Recrisp Recrisp Tip: The Small Container 1.4L container is the perfect size for leftovers. 3 4 1 Add Crisper Plate 2 Add foods for crisping Add foods that you want to crisp (proteins, veggies, etc.). Attach PowerPod and select mode Place PowerPod on container. Select Recrisp. Cook for 5-12 minutes or until food is heated through. Remove Crisper Plate and serve Use a fork to remove the Crisper Plate, then serve. TempWare containers can be placed directly on a surface. WATCH VIDEOS ON HOW TO GET STARTED Use the adaptor for the large container. When checking food, lift away pod with adaptor connected. Tips: Large Container 3.8L Small Container 1.4L"
     },
     {
       "id": "quick-start-p6",
