@@ -706,6 +706,9 @@
     elements.pauseTimer.addEventListener("click", pauseTimer);
     elements.resetTimer.addEventListener("click", resetTimer);
     elements.closeTimer.addEventListener("click", () => {
+      stopTimer();
+      state.timer.remaining = 0;
+      updateTimerDisplay();
       elements.timerWidget.classList.add("hidden");
     });
 
@@ -813,7 +816,9 @@
       </div>
     `;
 
-    elements.recipeDialog.showModal();
+    if (!elements.recipeDialog.open) {
+      elements.recipeDialog.showModal();
+    }
   }
 
   renderHero();
@@ -851,15 +856,20 @@
           <button class="button button--primary" type="button" onclick="document.getElementById('recipeDialog').close()">
             Let's cook! 🍳
           </button>
-          <button class="button button--ghost" type="button" onclick="
-            const event = new Event('click');
-            event.target = { closest: () => null };
-            document.getElementById('dialogContent').innerHTML = '';
-          ">Show shortcuts</button>
+          <button class="button button--ghost" type="button" id="welcomeShortcutsButton">
+            Show shortcuts
+          </button>
         </div>
       `;
       elements.recipeDialog.showModal();
       localStorage.setItem(WELCOME_KEY, "true");
+
+      const welcomeShortcutsButton = document.getElementById("welcomeShortcutsButton");
+      if (welcomeShortcutsButton) {
+        welcomeShortcutsButton.addEventListener("click", () => {
+          showKeyboardShortcuts();
+        });
+      }
     }, 1000);
   }
 })();
