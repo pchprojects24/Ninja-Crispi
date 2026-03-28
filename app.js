@@ -49,7 +49,10 @@
       subtitle: "Guide summary",
       text: highlight.bullets.join(" "),
       source: highlight.source,
-      href: "#searchSection",
+      href:
+        highlight.source.toLowerCase().includes("owner") || highlight.source.toLowerCase().includes("care")
+          ? "download.pdf"
+          : "18733282951964.pdf",
       favoriteId: `highlight:${highlight.id}`,
     })),
     ...data.pages.map((page) => ({
@@ -308,7 +311,11 @@
       return matchesFilter && matchesText && matchesFavorite;
     });
 
-    elements.resultsSummary.textContent = `${results.length} result${results.length === 1 ? "" : "s"} shown`;
+    const displayedCount = Math.min(results.length, 24);
+    elements.resultsSummary.textContent =
+      results.length > displayedCount
+        ? `Showing ${displayedCount} of ${results.length} results`
+        : `${results.length} result${results.length === 1 ? "" : "s"} shown`;
 
     if (!results.length) {
       elements.searchResults.innerHTML = `
@@ -335,8 +342,8 @@
               ${
                 item.kind === "recipe"
                   ? `<button class="button button--ghost" type="button" data-open-recipe="${item.title}">Open recipe</button>`
-                  : `<a class="button button--ghost" href="./${item.kind === "page" ? item.href : "#searchSection"}" ${
-                      item.kind === "page" ? 'target="_blank" rel="noreferrer"' : ""
+                  : `<a class="button button--ghost" href="./${item.href}" ${
+                      item.kind !== "recipe" ? 'target="_blank" rel="noreferrer"' : ""
                     }>Open source</a>`
               }
             </div>
