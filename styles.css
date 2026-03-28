@@ -10,6 +10,68 @@
   --shadow: 0 24px 80px rgba(21, 32, 43, 0.12);
   --border: rgba(21, 32, 43, 0.08);
   --success: #0a8f62;
+  --transition-fast: 160ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] {
+  --bg: #0f1419;
+  --surface: rgba(30, 35, 42, 0.88);
+  --surface-strong: #1e2329;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #ff8b47;
+  --accent-strong: #fc6b21;
+  --chip: #21262d;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  --border: rgba(255, 255, 255, 0.1);
+  --success: #2ea043;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.favorite-button.pulse {
+  animation: pulse 0.3s ease;
 }
 
 * {
@@ -29,6 +91,7 @@ body {
     var(--bg);
   color: var(--text);
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  transition: background var(--transition-smooth), color var(--transition-smooth);
 }
 
 a {
@@ -118,14 +181,22 @@ input {
   border: 1px solid transparent;
   cursor: pointer;
   text-decoration: none;
-  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+  transition: transform var(--transition-fast), background var(--transition-fast),
+              border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .button:hover,
 .chip:hover,
 .favorite-button:hover,
 .dialog__close:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.button:active,
+.chip:active,
+.favorite-button:active {
+  transform: translateY(0);
 }
 
 .button--primary {
@@ -215,6 +286,13 @@ main {
   border: 1px solid var(--border);
   border-radius: 18px;
   background: var(--surface-strong);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.search-field input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(252, 107, 33, 0.1);
+  outline: none;
 }
 
 .chip {
@@ -253,6 +331,19 @@ main {
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.86);
   border: 1px solid var(--border);
+  animation: fadeIn var(--transition-smooth) ease-out;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+              border-color var(--transition-fast);
+}
+
+.result:hover,
+.highlight-card:hover,
+.recipe-card:hover,
+.source-card:hover,
+.research-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: rgba(252, 107, 33, 0.2);
 }
 
 .result h3,
@@ -389,4 +480,395 @@ mark {
   .panel--search {
     position: static;
   }
+
+  .theme-toggle {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .timer-widget {
+    bottom: 0.5rem;
+    right: 0.5rem;
+    left: 0.5rem;
+    width: auto;
+    min-width: 0;
+  }
+
+  .cooking-step {
+    padding: 1rem;
+  }
+
+  .dialog {
+    width: calc(100% - 0.5rem);
+  }
+
+  .result__actions,
+  .hero__actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .result__actions button,
+  .result__actions a,
+  .hero__actions button,
+  .hero__actions a {
+    width: 100%;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Theme toggle */
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  box-shadow: var(--shadow);
+  transition: transform var(--transition-fast), background var(--transition-fast);
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1) rotate(15deg);
+}
+
+/* Timer widget */
+.timer-widget {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 100;
+  padding: 1rem;
+  border-radius: 18px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  min-width: 200px;
+  animation: slideDown var(--transition-smooth);
+}
+
+.timer-widget.hidden {
+  display: none;
+}
+
+.timer-display {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0.5rem 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.timer-controls button {
+  flex: 1;
+  min-height: 36px;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+}
+
+/* Shopping list */
+.shopping-list {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+}
+
+.shopping-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  margin-bottom: 0.25rem;
+  transition: opacity var(--transition-fast);
+}
+
+.shopping-list-item.checked {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.shopping-list-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+/* Cooking mode */
+.cooking-mode {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--surface-strong);
+  z-index: 1000;
+  overflow-y: auto;
+  animation: scaleIn var(--transition-smooth);
+}
+
+.cooking-mode-header {
+  position: sticky;
+  top: 0;
+  background: var(--surface-strong);
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.cooking-step {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  animation: fadeIn var(--transition-smooth);
+}
+
+.cooking-step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.cooking-navigation {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: space-between;
+}
+
+/* Recipe notes */
+.recipe-notes {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 205, 146, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(252, 107, 33, 0.2);
+}
+
+.recipe-notes textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-strong);
+  color: var(--text);
+  font-family: inherit;
+  resize: vertical;
+}
+
+/* Rating system */
+.rating-display {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0.5rem 0;
+}
+
+.star-rating {
+  display: flex;
+  gap: 0.25rem;
+  font-size: 1.5rem;
+}
+
+.star-rating button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--muted);
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.star-rating button:hover,
+.star-rating button.active {
+  color: #fbbf24;
+  transform: scale(1.2);
+}
+
+/* Search suggestions */
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.5rem;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 50;
+  animation: slideDown var(--transition-fast);
+}
+
+.search-field {
+  position: relative;
+}
+
+.suggestion-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  border-bottom: 1px solid var(--border);
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background: rgba(252, 107, 33, 0.08);
+}
+
+.suggestion-highlight {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* Loading state */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Notification toast */
+.toast {
+  position: fixed;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--surface-strong);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  z-index: 1000;
+  transition: transform var(--transition-smooth), opacity var(--transition-smooth);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Print styles */
+@media print {
+  .theme-toggle,
+  .timer-widget,
+  .button,
+  .favorite-button,
+  .hero__actions,
+  .search-field,
+  .chip-row,
+  .dialog__close {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+  }
+
+  .result,
+  .highlight-card,
+  .recipe-card,
+  .source-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}
+
+/* Keyboard shortcuts hint */
+.keyboard-hint {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  pointer-events: none;
+}
+
+.keyboard-hint.show {
+  opacity: 1;
+}
+
+/* Improved focus states */
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Improved chip transitions */
+.chip {
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+/* Improved dialog animation */
+.dialog {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity var(--transition-smooth), transform var(--transition-smooth);
+}
+
+.dialog[open] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Smooth scroll padding for fixed header */
+html {
+  scroll-padding-top: 100px;
 }

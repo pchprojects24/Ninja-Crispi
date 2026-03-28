@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,6 +11,37 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
+      🌙
+    </button>
+
+    <!-- Timer Widget -->
+    <div class="timer-widget hidden" id="timerWidget">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <strong>Cooking Timer</strong>
+        <button style="border: none; background: none; cursor: pointer; font-size: 1.25rem;"
+                id="closeTimer" type="button" aria-label="Close timer">×</button>
+      </div>
+      <div class="timer-display" id="timerDisplay">00:00</div>
+      <div class="timer-controls">
+        <button class="button button--ghost" id="startTimer" type="button">Start</button>
+        <button class="button button--ghost" id="pauseTimer" type="button">Pause</button>
+        <button class="button button--ghost" id="resetTimer" type="button">Reset</button>
+      </div>
+      <div style="margin-top: 0.75rem;">
+        <input type="number" id="timerMinutes" min="1" max="180" value="10"
+               style="width: 60px; padding: 0.25rem; border: 1px solid var(--border); border-radius: 4px; background: var(--surface-strong); color: var(--text);" />
+        <label for="timerMinutes" style="font-size: 0.85rem; margin-left: 0.25rem;">minutes</label>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Keyboard Hint -->
+    <div class="keyboard-hint" id="keyboardHint">Press ? for keyboard shortcuts</div>
+
     <div class="app-shell">
       <header class="hero">
         <div class="hero__copy">
@@ -21,6 +52,9 @@
             <a class="button button--primary" href="#searchSection">Search the guides</a>
             <button class="button button--ghost" id="randomRecipeButton" type="button">
               Pick tonight&rsquo;s idea
+            </button>
+            <button class="button button--ghost" id="showShortcutsButton" type="button" title="Press ? for shortcuts">
+              ⌨️ Shortcuts
             </button>
           </div>
           <div class="hero__stats" id="heroStats"></div>
