@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ninja CRISPi Companion</title>
+    <meta
+      name="description"
+      content="A mobile-friendly, searchable companion for the Ninja CRISPi portable cooking system."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero">
+        <div class="hero__copy">
+          <p class="eyebrow">Ninja CRISPi Companion</p>
+          <h1>Everything from the box, organised for quick phone-friendly cooking.</h1>
+          <p class="hero__lede" id="productSummary"></p>
+          <div class="hero__actions">
+            <a class="button button--primary" href="#searchSection">Search the guides</a>
+            <button class="button button--ghost" id="randomRecipeButton" type="button">
+              Pick tonight&rsquo;s idea
+            </button>
+          </div>
+          <div class="hero__stats" id="heroStats"></div>
+        </div>
+        <section class="hero-card" aria-label="Quick facts">
+          <h2>Quick facts</h2>
+          <dl id="quickFacts"></dl>
+        </section>
+      </header>
+
+      <main>
+        <section class="panel panel--search" id="searchSection">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Search</p>
+              <h2>Search across recipes, charts, safety notes, and the full manuals.</h2>
+            </div>
+            <label class="favorites-toggle">
+              <input id="favoritesOnly" type="checkbox" />
+              <span>Favorites only</span>
+            </label>
+          </div>
+          <label class="search-field">
+            <span class="sr-only">Search the CRISPi companion</span>
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="Search for chicken, 75°C, cleaning, cod, air fry..."
+              autocomplete="off"
+            />
+          </label>
+          <div class="chip-row" id="filterChips" aria-label="Category filters"></div>
+          <p class="results-summary" id="resultsSummary"></p>
+          <div class="search-results" id="searchResults"></div>
+        </section>
+
+        <div class="grid-two">
+          <section class="panel">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Highlights</p>
+                <h2>What matters most</h2>
+              </div>
+            </div>
+            <div class="stack" id="highlightCards"></div>
+          </section>
+
+          <section class="panel">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Meal planning</p>
+                <h2>Weeknight inspiration</h2>
+              </div>
+            </div>
+            <ul class="idea-list" id="mealIdeas"></ul>
+          </section>
+        </div>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Recipes</p>
+              <h2>Recipe spotlights from the guide</h2>
+            </div>
+          </div>
+          <div class="card-grid" id="recipeCards"></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Original documents</p>
+              <h2>Manuals and downloaded references</h2>
+            </div>
+          </div>
+          <div class="card-grid" id="sourceCards"></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Helpful extras</p>
+              <h2>Useful research links</h2>
+            </div>
+          </div>
+          <div class="card-grid" id="researchCards"></div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="recipeDialog" class="dialog">
+      <article class="dialog__card">
+        <button class="dialog__close" id="closeDialogButton" type="button" aria-label="Close">
+          ×
+        </button>
+        <div id="dialogContent"></div>
+      </article>
+    </dialog>
+
+    <script src="./data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
