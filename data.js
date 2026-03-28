@@ -11,7 +11,7 @@ window.NINJA_CRISPI_DATA = {
     "keyFacts": [
       {
         "label": "PowerPod",
-        "value": "The quick start guide describes a 1700-watt pod, while the FN100 owner’s guide specifications list 1500W; verify the printed label on your own unit if exact wattage matters."
+        "value": "The quick start guide describes a 1700-watt pod, but the FN100 owner’s guide specifications list 1500W; treat the owner’s guide and the printed label on your own unit as the authoritative reference."
       },
       {
         "label": "Containers",

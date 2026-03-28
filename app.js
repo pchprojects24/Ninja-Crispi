@@ -21,7 +21,7 @@
     closeDialogButton: document.getElementById("closeDialogButton"),
   };
 
-  const FAVORITES_KEY = "app.ninja-crispi.favorites.v1";
+  const FAVORITES_KEY = "ninja-crispi-companion.favorites.v1";
   const MAX_RESULTS = 24;
   const state = {
     activeFilter: "all",
