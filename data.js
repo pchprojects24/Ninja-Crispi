@@ -15,7 +15,7 @@ window.NINJA_CRISPI_DATA = {
       },
       {
         "label": "Containers",
-        "value": "1.4L small container for 1–2 servings and 3.8L large container for up to 6 servings."
+        "value": "1.4L small container for 1–2 servings, 2.4L medium container for 2–4 servings, and 3.8L large container for up to 6 servings."
       },
       {
         "label": "Functions",
@@ -111,7 +111,7 @@ window.NINJA_CRISPI_DATA = {
     },
     {
       "title": "Coconut Prawns",
-      "container": "Small container 1.4L",
+      "container": "Medium container 2.4L",
       "function": "Air Fry",
       "time": "Prep 15 min • Cook 8 min",
       "serves": "2 servings",
@@ -137,7 +137,7 @@ window.NINJA_CRISPI_DATA = {
     },
     {
       "title": "Prosciutto Red Pesto Cod with Baby Vegetables",
-      "container": "Small container 1.4L",
+      "container": "Medium container 2.4L",
       "function": "Air Fry",
       "time": "Prep 10 min • Cook 15 min",
       "serves": "2 servings",
@@ -190,7 +190,7 @@ window.NINJA_CRISPI_DATA = {
     },
     {
       "title": "Peri Peri Chicken",
-      "container": "Large container 3.8L",
+      "container": "Medium container 2.4L",
       "function": "Roast",
       "time": "Prep 5 min • Marinade 1+ hr • Cook 55 min",
       "serves": "4 servings",
