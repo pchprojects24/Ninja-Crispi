@@ -86,8 +86,9 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(252, 107, 33, 0.18), transparent 30%),
-    radial-gradient(circle at top right, rgba(255, 205, 146, 0.35), transparent 20%),
+    radial-gradient(ellipse at top left, rgba(252, 107, 33, 0.22), transparent 38%),
+    radial-gradient(ellipse at top right, rgba(255, 205, 146, 0.40), transparent 30%),
+    radial-gradient(ellipse at bottom center, rgba(252, 107, 33, 0.08), transparent 60%),
     var(--bg);
   color: var(--text);
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -121,7 +122,7 @@ input {
 .hero {
   display: grid;
   gap: 1.25rem;
-  padding: 1.5rem;
+  padding: 2rem;
 }
 
 .hero__copy h1,
@@ -133,16 +134,30 @@ input {
 
 .hero__copy h1 {
   font-size: clamp(2.2rem, 6vw, 4.3rem);
-  max-width: 11ch;
+  max-width: 15ch;
+  line-height: 1.08;
 }
 
 .eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin: 0 0 0.5rem;
   color: var(--accent-strong);
   font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+}
+
+.eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  border-radius: 999px;
+  background: var(--accent);
+  flex-shrink: 0;
 }
 
 .hero__lede,
@@ -211,6 +226,12 @@ input {
   color: var(--text);
 }
 
+[data-theme="dark"] .button--ghost {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text);
+}
+
 .hero__stats {
   margin-top: 1rem;
 }
@@ -232,8 +253,13 @@ input {
 .hero-card {
   padding: 1.25rem;
   border-radius: 24px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(246, 244, 238, 0.94));
-  border: 1px solid var(--border);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.97) 0%, rgba(255, 237, 213, 0.9) 100%);
+  border: 1px solid rgba(252, 107, 33, 0.15);
+}
+
+[data-theme="dark"] .hero-card {
+  background: linear-gradient(160deg, rgba(35, 40, 48, 0.97) 0%, rgba(50, 35, 20, 0.9) 100%);
+  border-color: rgba(252, 107, 33, 0.2);
 }
 
 .hero-card dl {
@@ -257,12 +283,12 @@ input {
 
 main {
   display: grid;
-  gap: 1.2rem;
-  margin-top: 1.2rem;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 .panel {
-  padding: 1.25rem;
+  padding: 1.5rem;
 }
 
 .panel--search {
@@ -282,7 +308,7 @@ main {
 .search-field input {
   width: 100%;
   min-height: 56px;
-  padding: 0 1rem;
+  padding: 0 1rem 0 3rem;
   border: 1px solid var(--border);
   border-radius: 18px;
   background: var(--surface-strong);
@@ -319,7 +345,7 @@ main {
 }
 
 .card-grid {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
 .result,
@@ -331,9 +357,10 @@ main {
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.86);
   border: 1px solid var(--border);
+  border-top: 3px solid transparent;
   animation: fadeIn var(--transition-smooth) ease-out;
   transition: transform var(--transition-fast), box-shadow var(--transition-fast),
-              border-color var(--transition-fast);
+              border-color var(--transition-fast), border-top-color var(--transition-fast);
 }
 
 .result:hover,
@@ -344,6 +371,7 @@ main {
   transform: translateY(-3px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   border-color: rgba(252, 107, 33, 0.2);
+  border-top-color: var(--accent);
 }
 
 .result h3,
@@ -459,7 +487,7 @@ mark {
   .hero {
     grid-template-columns: 1.35fr 0.9fr;
     align-items: stretch;
-    padding: 1.8rem;
+    padding: 2.5rem 3rem;
   }
 }
 
@@ -734,6 +762,19 @@ mark {
 
 .search-field {
   position: relative;
+  display: block;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: var(--muted);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .suggestion-item {
@@ -1354,5 +1395,28 @@ html {
 
   .cooking-step-text {
     font-size: 1rem;
+  }
+}
+
+/* Footer */
+.app-footer {
+  margin-top: 2rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.app-footer__sep {
+  opacity: 0.4;
+}
+
+@media (max-width: 400px) {
+  .search-field input {
+    padding-left: 2.5rem;
   }
 }
