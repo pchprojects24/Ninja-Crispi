@@ -13,6 +13,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="CRISPi" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -90,6 +93,10 @@
           </div>
           <label class="search-field">
             <span class="sr-only">Search the CRISPi companion</span>
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
             <input
               id="searchInput"
               type="search"
@@ -154,6 +161,11 @@
           <div class="card-grid" id="researchCards"></div>
         </section>
       </main>
+      <footer class="app-footer">
+        <span>Ninja CRISPi Companion</span>
+        <span class="app-footer__sep">·</span>
+        <span>All content sourced from official Ninja manuals</span>
+      </footer>
     </div>
 
     <dialog id="recipeDialog" class="dialog">
