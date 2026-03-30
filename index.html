@@ -103,6 +103,7 @@
               placeholder="Search for chicken, 75°C, cleaning, cod, air fry..."
               autocomplete="off"
             />
+            <button class="search-clear" id="searchClear" type="button" aria-label="Clear search">×</button>
           </label>
           <div class="chip-row" id="filterChips" aria-label="Category filters"></div>
           <p class="results-summary" id="resultsSummary"></p>
@@ -131,7 +132,7 @@
           </section>
         </div>
 
-        <section class="panel">
+        <section class="panel" id="recipesSection">
           <div class="section-heading">
             <div>
               <p class="eyebrow">Recipes</p>
@@ -176,6 +177,30 @@
         <div id="dialogContent"></div>
       </article>
     </dialog>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav" id="bottomNav" aria-label="Quick navigation">
+      <a class="bottom-nav__item" href="#searchSection" id="navSearch">
+        <span class="bottom-nav__icon">🔍</span>
+        <span>Search</span>
+      </a>
+      <a class="bottom-nav__item" href="#recipesSection" id="navRecipes">
+        <span class="bottom-nav__icon">🍽️</span>
+        <span>Recipes</span>
+      </a>
+      <button class="bottom-nav__item" type="button" id="navShopping">
+        <span class="bottom-nav__icon">🛒</span>
+        <span>Shopping</span>
+      </button>
+      <button class="bottom-nav__item" type="button" id="navTimer">
+        <span class="bottom-nav__icon">⏱️</span>
+        <span>Timer</span>
+      </button>
+      <button class="bottom-nav__item" type="button" id="navProgress">
+        <span class="bottom-nav__icon">📊</span>
+        <span>Progress</span>
+      </button>
+    </nav>
 
     <script src="./data.js"></script>
     <script src="./app.js"></script>
