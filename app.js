@@ -172,10 +172,13 @@
   }
 
   // Toast notification
-  function showToast(message, duration = 3000) {
+  function showToast(message, duration = 3000, type = '') {
     elements.toast.textContent = message;
+    elements.toast.classList.remove('toast--success', 'toast--error', 'toast--info');
+    if (type) elements.toast.classList.add(`toast--${type}`);
     elements.toast.classList.add("show");
-    setTimeout(() => {
+    clearTimeout(elements.toast._hideTimeout);
+    elements.toast._hideTimeout = setTimeout(() => {
       elements.toast.classList.remove("show");
     }, duration);
   }
@@ -210,7 +213,7 @@
 
       if (state.timer.remaining <= 0) {
         stopTimer();
-        showToast("⏰ Timer finished!");
+        showToast("⏰ Timer finished!", 5000, 'success');
         if ('Notification' in window && Notification.permission === 'granted') {
           new Notification('Ninja CRISPi Timer', {
             body: 'Your cooking timer has finished!',
@@ -382,7 +385,7 @@
       setTimeout(() => button.classList.remove('pulse'), 300);
     }
 
-    showToast(state.favorites.has(favoriteId) ? 'Added to favorites! ⭐' : 'Removed from favorites');
+    showToast(state.favorites.has(favoriteId) ? 'Added to favorites! ⭐' : 'Removed from favorites', 3000, state.favorites.has(favoriteId) ? 'success' : 'info');
   }
 
   function favoriteButtonMarkup(favoriteId) {
@@ -398,8 +401,25 @@
     `;
   }
 
+  function getGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning, chef!';
+    if (hour < 17) return 'Good afternoon, chef!';
+    if (hour < 21) return 'Good evening, chef!';
+    return "Late night snack? Let's cook!";
+  }
+
   function renderHero() {
     elements.productSummary.textContent = data.product.summary;
+
+    // Greeting
+    const existingGreeting = elements.productSummary.previousElementSibling;
+    if (!existingGreeting || !existingGreeting.classList.contains('hero__greeting')) {
+      const greeting = document.createElement('span');
+      greeting.className = 'hero__greeting';
+      greeting.textContent = getGreeting();
+      elements.productSummary.parentNode.insertBefore(greeting, elements.productSummary);
+    }
 
     const historyCount = state.cookingHistory.length;
     elements.heroStats.innerHTML = [
@@ -496,13 +516,17 @@
             ${rating > 0 ? `<div class="rating-display" style="color: #fbbf24; margin: 0.5rem 0;">${stars}</div>` : ''}
             ${recipe.cookedCount > 0 ? `<div class="cooked-badge">🍳 Cooked ${recipe.cookedCount}x</div>` : ''}
             <p>${recipe.summary}</p>
+            <div class="recipe-card__meta">
+              <span class="recipe-meta-badge recipe-meta-badge--container">${recipe.container}</span>
+              <span class="recipe-meta-badge recipe-meta-badge--function">${recipe.function}</span>
+            </div>
             <div class="tag-row">
               ${recipe.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}
             </div>
             <div class="result__actions">
               <span class="result__meta">${recipe.time} • ${recipe.serves}</span>
-              <button class="button button--ghost" type="button" data-open-recipe="${recipe.title}">
-                Open recipe
+              <button class="button button--primary" type="button" data-open-recipe="${recipe.title}" style="flex: 1; min-width: 0;">
+                View recipe →
               </button>
             </div>
           </article>
@@ -975,7 +999,7 @@
     };
     state.shoppingList.push(item);
     saveShoppingList();
-    showToast('Added to shopping list! 🛒');
+    showToast('Added to shopping list! 🛒', 3000, 'success');
   }
 
   function showShoppingList() {
@@ -1285,6 +1309,54 @@
     // Cooking history button
     if (elements.cookingHistoryButton) {
       elements.cookingHistoryButton.addEventListener("click", showCookingHistory);
+    }
+
+    // Mobile bottom navigation
+    const navShopping = document.getElementById('navShopping');
+    const navTimer = document.getElementById('navTimer');
+    const navProgress = document.getElementById('navProgress');
+    if (navShopping) navShopping.addEventListener('click', () => { showShoppingList(); });
+    if (navTimer) navTimer.addEventListener('click', () => {
+      elements.timerWidget.classList.toggle('hidden');
+      navTimer.classList.toggle('is-active', !elements.timerWidget.classList.contains('hidden'));
+    });
+    if (navProgress) navProgress.addEventListener('click', () => { showCookingHistory(); });
+
+    // Highlight active nav item on scroll
+    const navSections = [
+      { id: 'searchSection', navId: 'navSearch' },
+      { id: 'recipesSection', navId: 'navRecipes' },
+    ];
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const match = navSections.find(s => s.id === entry.target.id);
+          if (match) {
+            document.querySelectorAll('.bottom-nav__item').forEach(el => el.classList.remove('is-active'));
+            const navEl = document.getElementById(match.navId);
+            if (navEl) navEl.classList.add('is-active');
+          }
+        }
+      });
+    }, { threshold: 0.3 });
+    navSections.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    // Search clear button
+    const searchClear = document.getElementById('searchClear');
+    if (searchClear) {
+      elements.searchInput.addEventListener('input', () => {
+        searchClear.classList.toggle('visible', elements.searchInput.value.length > 0);
+      });
+      searchClear.addEventListener('click', () => {
+        elements.searchInput.value = '';
+        state.query = '';
+        searchClear.classList.remove('visible');
+        renderSearchResults();
+        elements.searchInput.focus();
+      });
     }
 
     // Dialog controls

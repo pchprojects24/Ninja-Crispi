@@ -1420,3 +1420,211 @@ html {
     padding-left: 2.5rem;
   }
 }
+
+/* =============================================
+   UX IMPROVEMENTS
+   ============================================= */
+
+/* Dark mode fixes for dialogs */
+[data-theme="dark"] .dialog__card {
+  background: var(--surface-strong);
+  color: var(--text);
+}
+
+[data-theme="dark"] .dialog__close {
+  background: var(--surface-strong);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+/* Search clear button */
+.search-clear {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: var(--chip);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+  z-index: 1;
+}
+
+.search-clear.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.search-clear:hover {
+  background: rgba(252, 107, 33, 0.12);
+  color: var(--accent);
+}
+
+/* Reserve space for clear button when it might appear */
+.search-field input {
+  padding-right: 3rem;
+}
+
+/* Filter chips: horizontally scrollable on mobile */
+.chip-row {
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 4px;
+}
+
+.chip-row::-webkit-scrollbar {
+  display: none;
+}
+
+/* Toast variants */
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toast.toast--success {
+  border-left: 4px solid var(--success);
+}
+
+.toast.toast--error {
+  border-left: 4px solid #dc2626;
+}
+
+.toast.toast--info {
+  border-left: 4px solid var(--accent);
+}
+
+/* Hero greeting */
+.hero__greeting {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  opacity: 0.85;
+}
+
+/* Recipe card: container & function meta badges */
+.recipe-meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.recipe-meta-badge--container {
+  background: rgba(21, 32, 43, 0.07);
+  color: var(--muted);
+}
+
+[data-theme="dark"] .recipe-meta-badge--container {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.recipe-meta-badge--function {
+  background: rgba(252, 107, 33, 0.1);
+  color: var(--accent-strong);
+}
+
+/* Mobile Bottom Navigation */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: var(--surface-strong);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(18px);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
+}
+
+.bottom-nav__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 0.25rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  gap: 0.2rem;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+  text-decoration: none;
+  min-height: 56px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.bottom-nav__item.is-active {
+  color: var(--accent);
+}
+
+.bottom-nav__item:hover,
+.bottom-nav__item:focus-visible {
+  color: var(--accent);
+}
+
+.bottom-nav__icon {
+  font-size: 1.35rem;
+  line-height: 1;
+  transition: transform var(--transition-fast);
+}
+
+.bottom-nav__item:hover .bottom-nav__icon,
+.bottom-nav__item.is-active .bottom-nav__icon {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 720px) {
+  .bottom-nav {
+    display: flex;
+  }
+
+  /* Push content above the nav bar */
+  .app-shell {
+    padding-bottom: 5rem;
+  }
+
+  /* Adjust floating elements to clear the bottom nav */
+  .timer-widget {
+    bottom: 5rem;
+  }
+
+  .toast {
+    bottom: 5.5rem;
+  }
+
+  /* Hide keyboard hint on mobile (not useful) */
+  .keyboard-hint {
+    display: none;
+  }
+
+  /* Search input padding for clear button */
+  .search-field input {
+    padding-right: 3rem;
+  }
+}
