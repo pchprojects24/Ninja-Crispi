@@ -853,6 +853,11 @@
         <button class="button button--ghost" type="button" id="shareRecipe">
           📤 Share
         </button>
+        ${recipe.youtubeUrl ? `
+          <a class="button button--primary" href="${recipe.youtubeUrl}" target="_blank" rel="noreferrer">
+            🎥 Watch video
+          </a>
+        ` : ''}
         <a class="button button--ghost" href="./18733282951964.pdf" target="_blank" rel="noreferrer">
           Open guide
         </a>

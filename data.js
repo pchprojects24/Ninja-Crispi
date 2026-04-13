@@ -133,7 +133,8 @@ window.NINJA_CRISPI_DATA = {
         "chicken"
       ],
       "pageRef": "Quick start guide page 12",
-      "summary": "Breadcrumbed chicken topped with passata, mozzarella, and basil to finish under the CRISPi pod."
+      "summary": "Breadcrumbed chicken topped with passata, mozzarella, and basil to finish under the CRISPi pod.",
+      "youtubeUrl": "https://ninjatestkitchen.eu/recipe/chicken-parmigiana/"
     },
     {
       "title": "Prosciutto Red Pesto Cod with Baby Vegetables",
@@ -173,7 +174,8 @@ window.NINJA_CRISPI_DATA = {
         "crowd-pleaser"
       ],
       "pageRef": "Quick start guide page 17",
-      "summary": "Chicken wings tossed with oil, cooked until crisp, then glazed with teriyaki sauce and finished with spring onion and sesame."
+      "summary": "Chicken wings tossed with oil, cooked until crisp, then glazed with teriyaki sauce and finished with spring onion and sesame.",
+      "youtubeUrl": "https://www.youtube.com/watch?v=GI4AZBD0Ngg"
     },
     {
       "title": "Beef Fajitas",
@@ -200,7 +202,8 @@ window.NINJA_CRISPI_DATA = {
         "roast"
       ],
       "pageRef": "Quick start guide page 20",
-      "summary": "Spatchcocked chicken rubbed with smoky peri peri spices and roasted until crisp, juicy, and ready for fries or salad."
+      "summary": "Spatchcocked chicken rubbed with smoky peri peri spices and roasted until crisp, juicy, and ready for fries or salad.",
+      "youtubeUrl": "https://ninjatestkitchen.eu/recipe/peri-peri-chicken/"
     },
     {
       "title": "Cheesy Tomato Pasta Bake",
@@ -257,9 +260,24 @@ window.NINJA_CRISPI_DATA = {
       "note": "Useful for real-world cleanup and meal prep impressions."
     },
     {
-      "title": "Tom’s Guide first look",
+      "title": "Tom's Guide first look",
       "url": "https://www.tomsguide.com/home/home-appliances/ninja-crispi-release-first-look",
-      "note": "Summarises launch positioning and the portable “take it to the table” angle."
+      "note": "Summarises launch positioning and the portable "take it to the table" angle."
+    },
+    {
+      "title": "Official Getting Started Video",
+      "url": "https://www.youtube.com/watch?v=ZfaB3NNGBDY",
+      "note": "Official Ninja Kitchen video with setup, cooking modes, and tips for using the Ninja Crispi."
+    },
+    {
+      "title": "Ninja CRISPi YouTube Playlist",
+      "url": "https://www.youtube.com/playlist?list=PL1w44a96ubQpD5d_zvwDELD4tpf6APifj",
+      "note": "Official playlist with over 40 videos featuring tips, recipes, and cooking demonstrations."
+    },
+    {
+      "title": "Maximize Your Crispi Tips",
+      "url": "https://www.youtube.com/watch?v=FX8uy0-ro9g",
+      "note": "Official video showing how to prep, cook, and store meals effectively with the Ninja Crispi."
     }
   ],
   "pages": [
